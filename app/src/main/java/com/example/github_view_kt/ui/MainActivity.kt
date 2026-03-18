@@ -1,5 +1,6 @@
 package com.example.github_view_kt.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -28,6 +29,8 @@ class MainActivity : AppCompatActivity() {
             val username = findViewById<EditText>(R.id.etUsername).text.toString().trim()
             if(username.isNotEmpty()){
                 Toast.makeText(this, "Usuario: $username", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, ReposActivity::class.java)
+                startActivity(intent)
             } else {
                 Toast.makeText(this, "Introduce un usario", Toast.LENGTH_SHORT).show()
             }
