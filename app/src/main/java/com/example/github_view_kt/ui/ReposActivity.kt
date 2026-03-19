@@ -13,12 +13,16 @@ import com.example.github_view_kt.R
 import com.example.github_view_kt.adapter.RepoAdapter
 import com.example.github_view_kt.model.Owner
 import com.example.github_view_kt.model.Repo
+import com.example.github_view_kt.network.RepoService
 import com.squareup.picasso.Picasso
 import java.net.URL
 
-private lateinit var ivAvatar: ImageView
-private lateinit var tvName: TextView
+
 class ReposActivity : AppCompatActivity() {
+    private lateinit var ivAvatar: ImageView
+    private lateinit var tvName: TextView
+    private val repoService = RepoService()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

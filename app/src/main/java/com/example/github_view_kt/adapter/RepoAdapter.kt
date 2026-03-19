@@ -30,7 +30,7 @@ class RepoAdapter (private val repoList: List<Repo>): RecyclerView.Adapter<RepoA
         p1: Int
     ) {
         val repo = repoList[p1]
-        p0.repoName.text = repo.owner.login
+        p0.repoName.text = repo.name
         p0.language.text = repo.language
     }
 
