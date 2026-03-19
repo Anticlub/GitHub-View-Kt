@@ -39,7 +39,7 @@ class ReposActivity : AppCompatActivity() {
         val mockList = getMockRepos()
         val firstOwner = mockList.firstOrNull()?.owner
         firstOwner?.let {
-            tvName.text = it.owner
+            tvName.text = it.login
             Picasso.get()
                 .load(it.avatarURL.toString())
                 .placeholder(R.drawable.ic_launcher_background)
@@ -52,22 +52,7 @@ class ReposActivity : AppCompatActivity() {
     }
     fun getMockRepos(): List<Repo> {
         return listOf(
-            Repo(
-                Owner(
-                    "anticlub",
-                    "Anticlub",
-                    URL("https://avatars.githubusercontent.com/u/180758399?v=4")
-                ),
-                "Kotlin"
-            ),
-            Repo(
-                Owner("johnDoe", "John Doe", URL("https://avatars.githubusercontent.com/u/123456789?v=4")),
-                "Java"
-            ),
-            Repo(
-                Owner("janeDev", "Jane Dev", URL("https://avatars.githubusercontent.com/u/987654321?v=4")),
-                "Swift"
-            )
+
         )
     }
 }

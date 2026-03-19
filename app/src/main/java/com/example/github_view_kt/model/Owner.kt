@@ -1,9 +1,10 @@
 package com.example.github_view_kt.model
 
-import java.net.URL
+import com.squareup.moshi.Json
+
 
 data class Owner(
-    val owner: String,
-    val name: String,
-    val avatarURL: URL
+    val login: String,
+    //val name: String,
+    @Json(name = "avatar_url") val avatarURL: String
 )

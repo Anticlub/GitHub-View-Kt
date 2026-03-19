@@ -2,6 +2,7 @@ package com.example.github_view_kt.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -10,8 +11,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.github_view_kt.R
+import com.example.github_view_kt.model.Repo
+import com.example.github_view_kt.network.RepoService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private lateinit var btnSearch: Button
+private val repoService = RepoService()
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +37,14 @@ class MainActivity : AppCompatActivity() {
             if(username.isNotEmpty()){
                 Toast.makeText(this, "Usuario: $username", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, ReposActivity::class.java)
-                startActivity(intent)
+                CoroutineScope(Dispatchers.IO).launch {
+                    val json = repoService.fetchReposJson(username)
+                    val repos = json?.let { repoService.parseRepos(it) }
+                    repos?.forEach {
+                        Log.d("REPO","lang: ${it.language}, login: ${it.owner.login}, nombrerepo: ${it.name}, avatar: ${it.owner.avatarURL}")
+                    }
+                }
+                //startActivity(intent)
             } else {
                 Toast.makeText(this, "Introduce un usario", Toast.LENGTH_SHORT).show()
             }
