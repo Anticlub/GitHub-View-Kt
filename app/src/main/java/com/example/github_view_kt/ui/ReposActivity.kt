@@ -35,39 +35,19 @@ class ReposActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.rvRepos)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        val json = intent.getStringExtra("reposJson")
+        val repos = json?.let { repoService.parseRepos(it) }
 
-        val mockList = getMockRepos()
-        val firstOwner = mockList.firstOrNull()?.owner
+        val firstOwner = repos?.firstOrNull()?.owner
         firstOwner?.let {
-            tvName.text = it.owner
+            tvName.text = it.login
             Picasso.get()
-                .load(it.avatarURL.toString())
+                .load(it.avatarURL)
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(ivAvatar)
         }
-        val adapter = RepoAdapter(mockList)
+        val adapter = RepoAdapter(repos ?: emptyList())
         recyclerView.adapter = adapter
 
-
-    }
-    fun getMockRepos(): List<Repo> {
-        return listOf(
-            Repo(
-                Owner(
-                    "anticlub",
-                    "Anticlub",
-                    URL("https://avatars.githubusercontent.com/u/180758399?v=4")
-                ),
-                "Kotlin"
-            ),
-            Repo(
-                Owner("johnDoe", "John Doe", URL("https://avatars.githubusercontent.com/u/123456789?v=4")),
-                "Java"
-            ),
-            Repo(
-                Owner("janeDev", "Jane Dev", URL("https://avatars.githubusercontent.com/u/987654321?v=4")),
-                "Swift"
-            )
-        )
     }
 }
