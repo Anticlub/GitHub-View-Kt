@@ -18,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private lateinit var btnSearch: Button
-private val repoService = RepoService()
+val repoService = RepoService()
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,15 +36,16 @@ class MainActivity : AppCompatActivity() {
             val username = findViewById<EditText>(R.id.etUsername).text.toString().trim()
             if(username.isNotEmpty()){
                 Toast.makeText(this, "Usuario: $username", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, ReposActivity::class.java)
                 CoroutineScope(Dispatchers.IO).launch {
                     val json = repoService.fetchReposJson(username)
-                    val repos = json?.let { repoService.parseRepos(it) }
-                    repos?.forEach {
-                        Log.d("REPO","lang: ${it.language}, login: ${it.owner.login}, nombrerepo: ${it.name}, avatar: ${it.owner.avatarURL}")
+
+                    launch (Dispatchers.Main){
+                        val intent = Intent(this@MainActivity, ReposActivity::class.java)
+                        intent.putExtra("reposJson", json)
+                        startActivity(intent)
                     }
                 }
-                //startActivity(intent)
+
             } else {
                 Toast.makeText(this, "Introduce un usario", Toast.LENGTH_SHORT).show()
             }
