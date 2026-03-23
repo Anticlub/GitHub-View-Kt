@@ -28,7 +28,7 @@ class RepoAdapter (private val repoList: List<Repo>): RecyclerView.Adapter<RepoA
         viewId: Int
     ) {
         val repo = repoList[viewId]
-        view.repoName.text = repo.name
+        view.repoName.text = repo.name.replaceFirstChar { it.uppercase() }
         view.language.text = repo.language ?: "Sin lenguaje"
     }
 
