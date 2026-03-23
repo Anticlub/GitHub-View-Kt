@@ -25,6 +25,11 @@
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRepos"
         android:layout_width="match_parent"

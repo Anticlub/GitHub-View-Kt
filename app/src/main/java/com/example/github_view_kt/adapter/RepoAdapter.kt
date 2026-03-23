@@ -31,7 +31,7 @@ class RepoAdapter (private val repoList: List<Repo>): RecyclerView.Adapter<RepoA
     ) {
         val repo = repoList[p1]
         p0.repoName.text = repo.name
-        p0.language.text = repo.language
+        p0.language.text = repo.language ?: "Sin lenguaje"
     }
 
     override fun getItemCount(): Int = repoList.size
