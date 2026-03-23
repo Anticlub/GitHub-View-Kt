@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.github_view_kt.R
 import com.example.github_view_kt.adapter.RepoAdapter
 import com.example.github_view_kt.databinding.ActivityReposBinding
+import com.example.github_view_kt.model.Repo
 import com.example.github_view_kt.network.RepoService
 import com.squareup.picasso.Picasso
+import java.util.ArrayList
 
 
 class ReposActivity : AppCompatActivity() {
@@ -32,8 +34,7 @@ class ReposActivity : AppCompatActivity() {
         binding.rvRepos.layoutManager = LinearLayoutManager(this)
         binding.rvRepos.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
-        val json = intent.getStringExtra("reposJson")
-        val repos = json?.let { repoService.parseRepos(it) }
+        val repos = intent.getSerializableExtra("repos") as? ArrayList<Repo> ?: arrayListOf()
 
         val firstOwner = repos?.firstOrNull()?.owner
         firstOwner?.let {

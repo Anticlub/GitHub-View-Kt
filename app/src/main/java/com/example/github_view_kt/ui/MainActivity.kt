@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 binding.btnSearchMain.isEnabled = false
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    val result = repoService.fetchReposJson(username)
+                    val result = repoService.fetchRepos(username)
                     launch(Dispatchers.Main) {
                         binding.progressBar.visibility = View.GONE
                         binding.btnSearchMain.isEnabled = true
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                         when (result) {
                             is NetworkResult.Success -> {
                                 val intent = Intent(this@MainActivity, ReposActivity::class.java)
-                                intent.putExtra("reposJson", result.data)
+                                intent.putExtra("repos", ArrayList(result.data))
                                 startActivity(intent)
                             }
                             is NetworkResult.HttpError -> {
