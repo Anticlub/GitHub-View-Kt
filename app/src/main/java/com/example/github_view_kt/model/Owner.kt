@@ -1,6 +1,5 @@
 package com.example.github_view_kt.model
 
-import android.os.Parcelable
 import com.squareup.moshi.Json
 import java.io.Serializable
 
