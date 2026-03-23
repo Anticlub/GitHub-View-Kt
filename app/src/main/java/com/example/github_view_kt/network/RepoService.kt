@@ -1,33 +1,29 @@
 package com.example.github_view_kt.network
 
 import com.example.github_view_kt.model.Repo
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
 
 class RepoService {
 
-    private val client = OkHttpClient()
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://api.github.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    private val service = retrofit.create(APIService::class.java)
 
-    fun fetchReposJson(user: String): String? {
-        val url = "https://api.github.com/users/$user/repos"
-        val request = Request.Builder().url(url).build()
-
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                println("Error: ${response.code()}")
-                return null
+    suspend fun fetchRepos(username: String): NetworkResult<List<Repo>> {
+        return try {
+            val response = service.getRepos(username)
+            if (response.isSuccessful) {
+                NetworkResult.Success(response.body() ?: emptyList())
+            } else {
+                NetworkResult.HttpError(response.code(), response.message())
             }
-            return response.body()?.string()
+        } catch (e: IOException) {
+            NetworkResult.NetworkError(e)
         }
-    }
-
-    fun parseRepos(jsonString: String): List<Repo>? {
-        val moshi = Moshi.Builder().add(com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory()).build()
-        val type = Types.newParameterizedType(List::class.java, Repo::class.java)
-        val adapter = moshi.adapter<List<Repo>>(type)
-        return adapter.fromJson(jsonString)
     }
 }

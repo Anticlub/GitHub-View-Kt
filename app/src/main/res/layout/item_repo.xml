@@ -8,11 +8,16 @@
         android:id="@+id/tvRepoName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ee"/>
+        android:text="Nombre Repo"
+        android:textStyle="bold"
+        android:layout_marginTop="5dp"
+        android:paddingLeft="10dp"/>
     <TextView
         android:id="@+id/tvRepoLanguage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="lenguaje"/>
+        android:text="Lenguaje"
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="10dp"/>
 
 </LinearLayout>
