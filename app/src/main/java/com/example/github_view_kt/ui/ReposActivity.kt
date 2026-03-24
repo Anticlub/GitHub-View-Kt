@@ -16,7 +16,6 @@ import com.example.github_view_kt.adapter.RepoAdapter
 import com.example.github_view_kt.databinding.ActivityReposBinding
 import com.example.github_view_kt.model.Repo
 import com.example.github_view_kt.network.RepoService
-import com.example.github_view_kt.ui.viewmodel.ReposViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import java.util.ArrayList
@@ -24,7 +23,6 @@ import java.util.ArrayList
 
 class ReposActivity : AppCompatActivity() {
     private lateinit var binding: ActivityReposBinding
-    private val viewModel: ReposViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,22 +38,17 @@ class ReposActivity : AppCompatActivity() {
         binding.rvRepos.layoutManager = LinearLayoutManager(this)
         binding.rvRepos.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.repos.collect { repos ->
-                    if (repos.isNotEmpty()) {
-                        val firstOwner = repos.first().owner
-                        binding.tvNameOwner.text = firstOwner.login
-                        Picasso.get()
-                            .load(firstOwner.avatarURL)
-                            .placeholder(R.drawable.ic_launcher_background)
-                            .into(binding.ivAvatar)
+        val repos = intent.getSerializableExtra("repos") as? ArrayList<Repo> ?: arrayListOf()
 
-                        binding.rvRepos.adapter = RepoAdapter(repos)
-                    }
-                }
-            }
+        repos.firstOrNull()?.owner?.let {
+            binding.tvNameOwner.text = it.login
+            Picasso.get()
+                .load(it.avatarURL)
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(binding.ivAvatar)
         }
+
+        binding.rvRepos.adapter = RepoAdapter(repos)
 
     }
 }
