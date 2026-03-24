@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+sealed class UiState {
+    object Idle : UiState()
+    object Loading : UiState()
+}
+
 class MainViewModel: ViewModel() {
     private val repoService = RepoService()
     private val _repos = MutableStateFlow<List<Repo>>(emptyList())
@@ -20,8 +25,12 @@ class MainViewModel: ViewModel() {
     private val _error = MutableSharedFlow<String>()
     val error: SharedFlow<String> = _error
 
+    private val _uiState = MutableStateFlow<UiState>(UiState.Idle)
+    val uiState: StateFlow<UiState> = _uiState
+
     fun getRepos(username: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value = UiState.Loading
             when (val result = repoService.fetchRepos(username)) {
                 is NetworkResult.Success -> {
                     _repos.value = result.data
@@ -41,6 +50,7 @@ class MainViewModel: ViewModel() {
                     _error.emit("Error al procesar la respuesta")
                 }
             }
+            _uiState.value = UiState.Idle
         }
     }
 

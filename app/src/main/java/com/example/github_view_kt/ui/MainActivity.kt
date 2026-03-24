@@ -15,6 +15,7 @@ import com.example.github_view_kt.databinding.ActivityMainBinding
 import com.example.github_view_kt.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import androidx.activity.viewModels
+import com.example.github_view_kt.ui.viewmodel.UiState
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -34,9 +35,6 @@ class MainActivity : AppCompatActivity() {
         binding.btnSearchMain.setOnClickListener {
             val username = binding.etUsername.text.toString().trim()
             if(username.isNotEmpty()){
-
-                binding.progressBar.visibility = View.VISIBLE
-                binding.btnSearchMain.isEnabled = false
                 viewModel.getRepos(username)
             } else {
                 Toast.makeText(this, "Introduce un usuario", Toast.LENGTH_SHORT).show()
@@ -49,8 +47,6 @@ class MainActivity : AppCompatActivity() {
                     viewModel.repos.collect { repos ->
                         if (repos.isNotEmpty()){
                             viewModel.clearRepos()
-                            binding.progressBar.visibility = View.GONE
-                            binding.btnSearchMain.isEnabled = true
                             val intent = Intent(this@MainActivity, ReposActivity::class.java)
                             intent.putExtra("repos", ArrayList(repos))
                             startActivity(intent)
@@ -59,9 +55,21 @@ class MainActivity : AppCompatActivity() {
                 }
                 launch {
                     viewModel.error.collect { errorMsg ->
-                        binding.progressBar.visibility = View.GONE
-                        binding.btnSearchMain.isEnabled = true
                         Toast.makeText(this@MainActivity, errorMsg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                launch {
+                    viewModel.uiState.collect { state ->
+                        when (state) {
+                            is UiState.Loading -> {
+                                binding.progressBar.visibility = View.VISIBLE
+                                binding.btnSearchMain.isEnabled = false
+                            }
+                            is UiState.Idle -> {
+                                binding.progressBar.visibility = View.GONE
+                                binding.btnSearchMain.isEnabled = true
+                            }
+                        }
                     }
                 }
             }
