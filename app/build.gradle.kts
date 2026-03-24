@@ -43,6 +43,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.activity.ktx)
+    implementation(libs.lifecycle.viewmodel.savedstate)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.kotlinx.coroutines.core)

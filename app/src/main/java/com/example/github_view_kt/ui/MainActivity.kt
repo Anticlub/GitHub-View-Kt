@@ -3,25 +3,23 @@ package com.example.github_view_kt.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.github_view_kt.R
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.github_view_kt.databinding.ActivityMainBinding
-import com.example.github_view_kt.network.NetworkResult
-import com.example.github_view_kt.network.RepoService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.example.github_view_kt.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
+import androidx.activity.viewModels
+import com.example.github_view_kt.ui.viewmodel.UiState
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    val repoService = RepoService()
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,41 +35,43 @@ class MainActivity : AppCompatActivity() {
         binding.btnSearchMain.setOnClickListener {
             val username = binding.etUsername.text.toString().trim()
             if(username.isNotEmpty()){
+                viewModel.getRepos(username)
+            } else {
+                Toast.makeText(this, "Introduce un usuario", Toast.LENGTH_SHORT).show()
+            }
+        }
 
-                binding.progressBar.visibility = View.VISIBLE
-                binding.btnSearchMain.isEnabled = false
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    val result = repoService.fetchRepos(username)
-                    launch(Dispatchers.Main) {
-                        binding.progressBar.visibility = View.GONE
-                        binding.btnSearchMain.isEnabled = true
-
-                        when (result) {
-                            is NetworkResult.Success -> {
-                                val intent = Intent(this@MainActivity, ReposActivity::class.java)
-                                intent.putExtra("repos", ArrayList(result.data))
-                                startActivity(intent)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.repos.collect { repos ->
+                        if (repos.isNotEmpty()){
+                            viewModel.clearRepos()
+                            val intent = Intent(this@MainActivity, ReposActivity::class.java)
+                            intent.putExtra("repos", ArrayList(repos))
+                            startActivity(intent)
+                        }
+                    }
+                }
+                launch {
+                    viewModel.error.collect { errorMsg ->
+                        Toast.makeText(this@MainActivity, errorMsg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                launch {
+                    viewModel.uiState.collect { state ->
+                        when (state) {
+                            is UiState.Loading -> {
+                                binding.progressBar.visibility = View.VISIBLE
+                                binding.btnSearchMain.isEnabled = false
                             }
-                            is NetworkResult.HttpError -> {
-                                val msg = when (result.code) {
-                                    404 -> "Usuario no encontrado"
-                                    403 -> "Límite de API alcanzado"
-                                    else -> "Error del servidor: ${result.code}"
-                                }
-                                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
-                            }
-                            is NetworkResult.NetworkError -> {
-                                Toast.makeText(this@MainActivity, "Sin conexión a internet", Toast.LENGTH_SHORT).show()
-                            }
-                            is NetworkResult.ParseError -> {
-                                Toast.makeText(this@MainActivity, "Error al procesar la respuesta", Toast.LENGTH_SHORT).show()
+                            is UiState.Idle -> {
+                                binding.progressBar.visibility = View.GONE
+                                binding.btnSearchMain.isEnabled = true
                             }
                         }
                     }
                 }
-            } else {
-                Toast.makeText(this, "Introduce un usuario", Toast.LENGTH_SHORT).show()
             }
         }
 
