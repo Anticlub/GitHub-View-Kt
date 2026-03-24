@@ -1,38 +1,33 @@
 package com.example.github_view_kt.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.github_view_kt.R
+import com.example.github_view_kt.databinding.ItemRepoBinding
 import com.example.github_view_kt.model.Repo
 
 class RepoAdapter (private val repoList: List<Repo>): RecyclerView.Adapter<RepoAdapter.RepoViewHolder>(){
 
-    class RepoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val repoName: TextView = itemView.findViewById(R.id.tvRepoName)
-        val language: TextView = itemView.findViewById(R.id.tvRepoLanguage)
+    class RepoViewHolder(private val binding: ItemRepoBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(repo: Repo) {
+            binding.tvRepoName.text = repo.name.replaceFirstChar { it.uppercase() }
+            binding.tvRepoLanguage.text = repo.language ?: "Sin lenguaje"
+        }
     }
     override fun onCreateViewHolder(
-        view: ViewGroup,
-        viewId: Int
+        parent: ViewGroup,
+        viewType: Int
     ): RepoViewHolder {
-        val v = LayoutInflater.from(view.context)
-            .inflate(R.layout.item_repo, view, false)
-        return RepoViewHolder(v)
+        val binding = ItemRepoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return RepoViewHolder(binding)
     }
 
     override fun onBindViewHolder(
-        view: RepoViewHolder,
-        viewId: Int
+        holder: RepoViewHolder,
+        position: Int
     ) {
-        val repo = repoList[viewId]
-        view.repoName.text = repo.name.replaceFirstChar { it.uppercase() }
-        view.language.text = repo.language ?: "Sin lenguaje"
+        holder.bind(repoList[position])
     }
 
     override fun getItemCount(): Int = repoList.size
-
-
 }
